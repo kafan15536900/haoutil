@@ -26,6 +26,7 @@
  */
 
 /* History
+ * 2013-4-1 v0.1.7.3 完善ku6，tudou规则
  * 2013-4-1 v0.1.7.2 完善ku6规则
  * 2013-3-31 v0.1.7.1 完善tudou外链
  * 2013-3-31 v0.1.7 增加对tudou支持（需要flashplayer11+）
@@ -75,7 +76,7 @@
             replace: iqiyi
         },
         'tudou': {
-            find: /http:\/\/js\.tudouui\.com\/bin\/lingtong\/(portal|social)player[^\.]*\.swf/i,
+            find: /http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i,
             replace: tudou
         },
         'tudou_out': {

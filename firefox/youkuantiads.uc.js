@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.3.8
+// @version         1.3.9
 // ==/UserScript==
 (function() {
     // YoukuAntiADs, request observer
@@ -18,7 +18,7 @@
             },
             'ku6': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/ku6.swf',
-                're': /http:\/\/player\.ku6cdn\.com\/default\/.*\/\d+\/player\.swf/i
+                're': /http:\/\/player\.ku6cdn\.com\/.*\/\d+\/player\.swf/i
             },
             'iqiyi': {
                 'player0': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf',
@@ -27,7 +27,7 @@
             },
             'tudou': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/tudou.swf',
-                're': /http:\/\/js\.tudouui\.com\/bin\/lingtong\/(portal|social)player[^\.]*\.swf/i
+                're': /http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i
             }
         },
         os: Cc['@mozilla.org/observer-service;1']
@@ -83,7 +83,7 @@
                     if(i == 'iqiyi') {
                         var wnd = this.getWindowForRequest(aSubject);
                         if(wnd) {
-                            if(wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]')) {
+                            if(!/iqiyi\.com/.test(wnd.top.location.host) || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]')) {
                                 if(site['player'] != site['player1']) {
                                     site['player'] = site['player1'];
                                     site['storageStream'] = site['storageStream1'] ? site['storageStream1'] : null;
