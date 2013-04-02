@@ -2,7 +2,7 @@
 // @name YoukuAntiADs
 // @author Harv
 // @description 通过替换swf播放器的方式来解决优酷的黑屏广告
-// @version 0.1.7.2
+// @version 0.1.7.3
 // @namespace http://userscripts.org/users/Harv
 // @updateURL https://userscripts.org/scripts/source/119622.meta.js
 // @include http://*/*
@@ -26,7 +26,7 @@
  */
 
 /* History
- * 2013-4-1 v0.1.7.3 完善ku6，tudou规则
+ * 2013-4-2 v0.1.7.3 完善ku6，tudou规则
  * 2013-4-1 v0.1.7.2 完善ku6规则
  * 2013-3-31 v0.1.7.1 完善tudou外链
  * 2013-3-31 v0.1.7 增加对tudou支持（需要flashplayer11+）
@@ -74,6 +74,10 @@
         'iqiyi': {
             find: /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i,
             replace: iqiyi
+        },
+        'iqiyi_out': {
+            find: /http:\/\/player\.video\.i?qiyi\.com\/([^\/]*)\/.*/i,
+            replace: iqiyi5 + '?vid=$1'
         },
         'tudou': {
             find: /http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i,
