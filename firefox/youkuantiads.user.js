@@ -2,11 +2,12 @@
 // @name YoukuAntiADs
 // @author Harv
 // @description 通过替换swf播放器的方式来解决优酷的黑屏广告
-// @version 0.1.7.3
+// @version 0.1.7.4
 // @namespace http://userscripts.org/users/Harv
 // @updateURL https://userscripts.org/scripts/source/119622.meta.js
 // @include http://*/*
 // @include https://*/*
+// @grant GM_xmlhttpRequest
 // ==/UserScript==
 
 /*
@@ -26,6 +27,7 @@
  */
 
 /* History
+ * 2013-4-12 v0.1.7.4 完善tudou外链
  * 2013-4-2 v0.1.7.3 完善ku6，tudou规则
  * 2013-4-1 v0.1.7.2 完善ku6规则
  * 2013-3-31 v0.1.7.1 完善tudou外链
@@ -111,36 +113,45 @@
         var player = elem.data || elem.src;
         if(!player) return;
 
-        var find, replace;
-        for(var i in players) {
+        var i, find, replace, isReplacing = false;
+        for(i in players) {
             find = players[i].find;
             if(find.test(player)) {
-                var isReplacing = false;
                 replace = players[i].replace;
-                if(i == 'iqiyi' && document.querySelector('span[data-flashplayerparam-flashurl]')) {
-                    replace = iqiyi5;
-                } else if(i == 'tudou_out') {
-                    if(/(iid|youkuId)=[^\/]+/.test(player)) {
-                         replace += player.replace(/.*((iid|youkuId)=[^\/]+).*/, '&$1');
-                    } else {
-                        isReplacing = true;
-                        if(!GM_xmlhttpRequest) return;
+                
+                preHandle();
 
+                if(!isReplacing) {
+                    reallyReplace();
+                }
+                break;
+            }
+        }
+
+        function preHandle() {
+            if(i == 'iqiyi' && document.querySelector('span[data-flashplayerparam-flashurl]')) {
+                replace = iqiyi5;
+            } else if(i == 'tudou_out') {
+                var match = player.match(/(iid|youkuId)=[^\/]+/i);
+                if(match) {
+                     replace += '&' + match[0];
+                } else {
+                    isReplacing = true;
+                    var icode = player.match(/\/([^\/]{11})\/.*v\.swf/i);
+                    if(icode) {
                         GM_xmlhttpRequest({
-                            method: 'HEAD',
-                            url: player,
+                            method: 'GET',
+                            url: 'http://api.tudou.com/v3/gw?method=item.info.get&appKey=myKey&format=json&itemCodes=' + icode[1],
                             onload: function(response) {
-                                replace += response.finalUrl.replace(/.*[?&]((iid|youkuId)=[^&]+).*/, '&$1');
-                                reallyReplace();
+                                var obj = eval('(' + response.responseText + ')');
+                                if(obj) {
+                                    replace += '&iid=' + obj['multiResult']['results'][0]['itemId'];
+                                    reallyReplace();
+                                }
                             }
                         });
                     }
                 }
-                if(!isReplacing) {
-                    reallyReplace();
-                }
-
-                break;
             }
         }
 
