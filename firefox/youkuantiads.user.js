@@ -2,7 +2,7 @@
 // @name YoukuAntiADs
 // @author Harv
 // @description 通过替换swf播放器的方式来解决优酷的黑屏广告
-// @version 0.1.7.4
+// @version 0.1.7.5
 // @namespace http://userscripts.org/users/Harv
 // @updateURL https://userscripts.org/scripts/source/119622.meta.js
 // @include http://*/*
@@ -27,7 +27,8 @@
  */
 
 /* History
- * 2013-4-12 v0.1.7.4 完善tudou外链
+ * 2013-4-14 v0.1.7.5 完善iqiyi外链规则，增加ku6外链支持
+ * 2013-4-12 v0.1.7.4 完善tudou外链支持
  * 2013-4-2 v0.1.7.3 完善ku6，tudou规则
  * 2013-4-1 v0.1.7.2 完善ku6规则
  * 2013-3-31 v0.1.7.1 完善tudou外链
@@ -73,13 +74,17 @@
             find: /http:\/\/player\.ku6cdn\.com\/default\/.*\/\d+\/player\.swf/i,
             replace: ku6
         },
+        'ku6_out': {
+            find: /http:\/\/player\.ku6\.com\/(inside|refer)\/([^\/]+)\/v\.swf.*/i,
+            replace: ku6 + '?vid=$2'
+        },
         'iqiyi': {
             find: /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i,
             replace: iqiyi
         },
         'iqiyi_out': {
-            find: /http:\/\/player\.video\.i?qiyi\.com\/([^\/]*)\/.*/i,
-            replace: iqiyi5 + '?vid=$1'
+            find: /http:\/\/(player|dispatcher)\.video\.i?qiyi\.com\/(.*[\?&]vid=)?([^\/&]+).*/i,
+            replace: iqiyi5 + '?vid=$3'
         },
         'tudou': {
             find: /http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i,
