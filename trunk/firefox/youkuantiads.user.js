@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name YoukuAntiADs
 // @author Harv
-// @description 通过替换swf播放器的方式来解决优酷的黑屏广告
-// @version 0.1.7.5
+// @description 视频去黑屏
+// @version 0.1.7.6
 // @namespace http://userscripts.org/users/Harv
 // @updateURL https://userscripts.org/scripts/source/119622.meta.js
+// @downloadURL https://userscripts.org/scripts/source/119622.user.js
 // @include http://*/*
 // @include https://*/*
 // @grant GM_xmlhttpRequest
@@ -27,6 +28,7 @@
  */
 
 /* History
+ * 2013-4-21 v0.1.7.6 完善tudou外链支持（Firefox使用GM_xmlhttpRequest，其他浏览器使用YQL获取重定向后的URL）
  * 2013-4-14 v0.1.7.5 完善iqiyi外链规则，增加ku6外链支持
  * 2013-4-12 v0.1.7.4 完善tudou外链支持
  * 2013-4-2 v0.1.7.3 完善ku6，tudou规则
@@ -61,38 +63,40 @@
     var iqiyi = 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf';
     var iqiyi5 = 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi5.swf';
     var tudou = 'https://haoutil.googlecode.com/svn/trunk/player/tudou.swf';
+    var tudou_olc = 'https://haoutil.googlecode.com/svn/trunk/player/testmod/olc_8.swf';
+    var tudou_sp = 'https://haoutil.googlecode.com/svn/trunk/player/testmod/sp.swf';
     var players = {
         'youku': {
-            find: /http:\/\/static\.youku\.com(\/v[\d\.]+)?\/v\/swf\/(loader|q?player[^\.]*)\.swf/i,
+            find: /^http:\/\/static\.youku\.com(\/v[\d\.]+)?\/v\/swf\/(loader|q?player[^\.]*)\.swf/i,
             replace: loader
         },
         'youku_out': {
-            find: /http:\/\/player\.youku\.com\/player\.php\/.*sid\/([\w=]+).*\/v\.swf/i,
+            find: /^http:\/\/player\.youku\.com\/player\.php\/.*sid\/([\w=]+).*\/v\.swf/i,
             replace: loader + '?showAd=0&VideoIDS=$1'
         },
         'ku6': {
-            find: /http:\/\/player\.ku6cdn\.com\/default\/.*\/\d+\/player\.swf/i,
+            find: /^http:\/\/player\.ku6cdn\.com\/default\/.*\/\d+\/player\.swf/i,
             replace: ku6
         },
         'ku6_out': {
-            find: /http:\/\/player\.ku6\.com\/(inside|refer)\/([^\/]+)\/v\.swf.*/i,
+            find: /^http:\/\/player\.ku6\.com\/(inside|refer)\/([^\/]+)\/v\.swf.*/i,
             replace: ku6 + '?vid=$2'
         },
         'iqiyi': {
-            find: /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i,
+            find: /^http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i,
             replace: iqiyi
         },
         'iqiyi_out': {
-            find: /http:\/\/(player|dispatcher)\.video\.i?qiyi\.com\/(.*[\?&]vid=)?([^\/&]+).*/i,
+            find: /^http:\/\/(player|dispatcher)\.video\.i?qiyi\.com\/(.*[\?&]vid=)?([^\/&]+).*/i,
             replace: iqiyi5 + '?vid=$3'
         },
         'tudou': {
-            find: /http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i,
+            find: /^http:\/\/js\.tudouui\.com\/.*player[^\.]*\.swf/i,
             replace: tudou
         },
         'tudou_out': {
-            find: /http:\/\/www\.tudou\.com\/.*\/v\.swf/i,
-            replace: tudou + '?tvcCode=-1'
+            find: /^http:\/\/www\.tudou\.com\/.*\/v\.swf/i,
+            replace: tudou_olc + '?tvcCode=-1&swfPath=' + tudou_sp
         }
     };
 
@@ -137,26 +141,17 @@
             if(i == 'iqiyi' && document.querySelector('span[data-flashplayerparam-flashurl]')) {
                 replace = iqiyi5;
             } else if(i == 'tudou_out') {
-                var match = player.match(/(iid|youkuId)=[^\/]+/i);
-                if(match) {
-                     replace += '&' + match[0];
-                } else {
-                    isReplacing = true;
-                    var icode = player.match(/\/([^\/]{11})\/.*v\.swf/i);
-                    if(icode) {
-                        GM_xmlhttpRequest({
-                            method: 'GET',
-                            url: 'http://api.tudou.com/v3/gw?method=item.info.get&appKey=myKey&format=json&itemCodes=' + icode[1],
-                            onload: function(response) {
-                                var obj = eval('(' + response.responseText + ')');
-                                if(obj) {
-                                    replace += '&iid=' + obj['multiResult']['results'][0]['itemId'];
-                                    reallyReplace();
-                                }
-                            }
-                        });
+                isReplacing = true;
+                var isFx = /firefox/i.test(navigator.userAgent);
+                GM_xmlhttpRequest({
+                    method: isFx ? 'HEAD' : 'GET',
+                    url: isFx ? player : 'http://query.yahooapis.com/v1/public/yql?q=use "http://javarants.com/yql/javascript.xml" as j; select * from j where code="response.object = y.rest(\'' + player + '\').followRedirects(false).get().headers.location;"&format=json',
+                    onload: function(response) {
+                        var match = (isFx ? response.finalUrl : response.responseText).match(/(iid|youkuid|resourceid|autoplay)=[^&]+/ig);
+                        if(match) replace += '&' + match.join('&');
+                        reallyReplace();
                     }
-                }
+                });
             }
         }
 
