@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.3.10
+// @version         1.4.0
 // ==/UserScript==
 (function() {
     // YoukuAntiADs, request observer
@@ -40,6 +40,35 @@
         },
         os: Cc['@mozilla.org/observer-service;1']
                 .getService(Ci.nsIObserverService),
+        init: function() {
+            var site = this.SITES['iqiyi'];
+            site['preHandle'] = function() {
+                var wnd = this.getWindowForRequest(arguments[0]);
+                if(wnd) {
+                    if(!/^((?!baidu).)*\.iqiyi\.com/i.test(wnd.top.location.host)
+                        || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]')) {
+                        if(site['player'] != site['player1']) {
+                            site['player'] = site['player1'];
+                            site['storageStream'] = site['storageStream1'] ? site['storageStream1'] : null;
+                            site['count'] = site['count1'] ? site['count1'] : null;
+                        }
+                    } else if(site['player'] != site['player0']) {
+                        site['player'] = site['player0'];
+                        site['storageStream'] = site['storageStream0'] ? site['storageStream0'] : null;
+                        site['count'] = site['count0'] ? site['count0'] : null;
+                    }
+                }
+            };
+            site['callback'] = function() {
+                 if(site['player0'] == site['player']) {
+                    site['storageStream0'] = site['storageStream'];
+                    site['count0'] = site['count'];
+                } else if(site['player1'] == site['player']) {
+                    site['storageStream1'] = site['storageStream'];
+                    site['count1'] = site['count'];
+                }
+            };
+        },
         // getPlayer, get modified player
         getPlayer: function(site, callback) {
             NetUtil.asyncFetch(site['player'], function(inputStream, status) {
@@ -57,7 +86,7 @@
                 site['storageStream'] = storageStream;
                 site['count'] = count;
 
-                if(typeof callback == 'function') {
+                if(typeof callback === 'function') {
                     callback();
                 }
             });
@@ -88,37 +117,15 @@
             for(var i in this.SITES) {
                 var site = this.SITES[i];
                 if(site['re'].test(http.URI.spec)) {
-                    if(i == 'iqiyi') {
-                        var wnd = this.getWindowForRequest(aSubject);
-                        if(wnd) {
-                            if(!/^((?!baidu).)*\.iqiyi\.com/i.test(wnd.top.location.host)
-                                || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]')) {
-                                if(site['player'] != site['player1']) {
-                                    site['player'] = site['player1'];
-                                    site['storageStream'] = site['storageStream1'] ? site['storageStream1'] : null;
-                                    site['count'] = site['count1'] ? site['count1'] : null;
-                                }
-                            } else if(site['player'] != site['player0']) {
-                                site['player'] = site['player0'];
-                                site['storageStream'] = site['storageStream0'] ? site['storageStream0'] : null;
-                                site['count'] = site['count0'] ? site['count0'] : null;
-                            }
-                        }
-                    }
+                    if(typeof site['preHandle'] === 'function')
+                        site['preHandle'].apply(this, arguments);
 
                     if(!site['storageStream'] || !site['count']) {
                         http.suspend();
                         this.getPlayer(site, function() {
-                            if(i == 'iqiyi') {
-                                if(site['player0'] == site['player']) {
-                                    site['storageStream0'] = site['storageStream'];
-                                    site['count0'] = site['count'];
-                                } else if(site['player1'] == site['player']) {
-                                    site['storageStream1'] = site['storageStream'];
-                                    site['count1'] = site['count'];
-                                }
-                            }
                             http.resume();
+                            if(typeof site['callback'] === 'function')
+                                site['callback'].apply(this, arguments);
                         });
                     }
 
@@ -131,7 +138,14 @@
                 }
             }
         },
+        QueryInterface: function(aIID) {
+            if(aIID.equals(Ci.nsISupports) || aIID.equals(Ci.nsIObserver))
+                return this;
+
+            return Cr.NS_ERROR_NO_INTERFACE;
+        },
         register: function() {
+            this.init();
             this.os.addObserver(this, 'http-on-examine-response', false);
         },
         unregister: function() {
@@ -158,15 +172,13 @@
 
     // register observer
     var y = new YoukuAntiADs();
-    var isLoaded = false;
     if(location == 'chrome://browser/content/browser.xul') {
-        isLoaded = true;
         y.register();
     }
 
     // unregister observer
     window.addEventListener('unload', function() {
-        if(location == 'chrome://browser/content/browser.xul' && isLoaded) {
+        if(location == 'chrome://browser/content/browser.xul') {
             y.unregister();
         }
     });
