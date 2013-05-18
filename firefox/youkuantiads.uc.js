@@ -5,7 +5,9 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.4.0
+// @version         1.4.1
+// @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
+// @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
 (function() {
     // YoukuAntiADs, request observer
@@ -21,8 +23,9 @@
                 're': /http:\/\/player\.ku6cdn\.com\/.*\/\d+\/player\.swf/i
             },
             'iqiyi': {
-                'player0': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf',
+                'player0': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi_out.swf',
                 'player1': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi5.swf',
+                'player2': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf',
                 're': /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i
             },
             'tudou': {
@@ -42,30 +45,38 @@
                 .getService(Ci.nsIObserverService),
         init: function() {
             var site = this.SITES['iqiyi'];
-            site['preHandle'] = function() {
-                var wnd = this.getWindowForRequest(arguments[0]);
+            site['preHandle'] = function(aSubject) {
+                var wnd = this.getWindowForRequest(aSubject);
                 if(wnd) {
-                    if(!/^((?!baidu).)*\.iqiyi\.com/i.test(wnd.top.location.host)
-                        || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]')) {
-                        if(site['player'] != site['player1']) {
-                            site['player'] = site['player1'];
-                            site['storageStream'] = site['storageStream1'] ? site['storageStream1'] : null;
-                            site['count'] = site['count1'] ? site['count1'] : null;
+                    site['cond'] = [
+                        /bilibili/i.test(wnd.top.location.host),
+                        !/^((?!baidu).)*\.iqiyi\.com/i.test(wnd.top.location.host)
+                            || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]'),
+                        true
+                    ];
+                    if(!site['cond']) return;
+                    
+                    for(var i = 0; i < site['cond'].length; i++) {
+                        if(site['cond'][i]) {
+                            if(site['player'] != site['player' + i]) {
+                                site['player'] = site['player' + i];
+                                site['storageStream'] = site['storageStream' + i] ? site['storageStream' + i] : null;
+                                site['count'] = site['count' + i] ? site['count' + i] : null;
+                            }
+                            break;
                         }
-                    } else if(site['player'] != site['player0']) {
-                        site['player'] = site['player0'];
-                        site['storageStream'] = site['storageStream0'] ? site['storageStream0'] : null;
-                        site['count'] = site['count0'] ? site['count0'] : null;
                     }
                 }
             };
             site['callback'] = function() {
-                 if(site['player0'] == site['player']) {
-                    site['storageStream0'] = site['storageStream'];
-                    site['count0'] = site['count'];
-                } else if(site['player1'] == site['player']) {
-                    site['storageStream1'] = site['storageStream'];
-                    site['count1'] = site['count'];
+                if(!site['cond']) return;
+
+                for(var i = 0; i < site['cond'].length; i++) {
+                    if(site['player' + i] == site['player']) {
+                        site['storageStream' + i] = site['storageStream'];
+                        site['count' + i] = site['count'];
+                        break;
+                    }
                 }
             };
         },
@@ -117,15 +128,17 @@
             for(var i in this.SITES) {
                 var site = this.SITES[i];
                 if(site['re'].test(http.URI.spec)) {
+                    var fn = this, args = Array.prototype.slice.call(arguments);
+
                     if(typeof site['preHandle'] === 'function')
-                        site['preHandle'].apply(this, arguments);
+                        site['preHandle'].apply(fn, args);
 
                     if(!site['storageStream'] || !site['count']) {
                         http.suspend();
                         this.getPlayer(site, function() {
                             http.resume();
                             if(typeof site['callback'] === 'function')
-                                site['callback'].apply(this, arguments);
+                                site['callback'].apply(fn, args);
                         });
                     }
 
