@@ -2,7 +2,7 @@
 // @name YoukuAntiADs
 // @author Harv
 // @description 视频去黑屏
-// @version 0.2.1
+// @version 0.2.3
 // @namespace http://userscripts.org/users/Harv
 // @updateURL https://userscripts.org/scripts/source/119622.meta.js
 // @downloadURL https://userscripts.org/scripts/source/119622.user.js
@@ -69,7 +69,7 @@
                         'replace': this.players['tudou']
                     },
                     'tudou_out': {
-                        'find': /^http:\/\/www\.tudou\.com\/.*\/v\.swf/i,
+                        'find': /^http:\/\/www\.tudou\.com\/.*(\/v\.swf)?/i,
                         'replace': this.players['tudou_olc'] + '?tvcCode=-1&swfPath=' + this.players['tudou_sp']
                     }
                 }
@@ -94,10 +94,11 @@
                 var isFx = /firefox/i.test(navigator.userAgent);
                 GM_xmlhttpRequest({
                     method: isFx ? 'HEAD' : 'GET',
-                    url: isFx ? player : 'query.yahooapis.com/v1/public/yql?q=use "https://haoutil.googlecode.com/svn/trunk/firefox/tudou_redirect.yql.xml" as tudou; select * from tudou where url=\'' + encodeURIComponent(player) + '\' and referer=\'' + window.location.href + '\'&format=json',
+                    url: isFx ? player : 'https://query.yahooapis.com/v1/public/yql?format=json&q=' + encodeURIComponent('use"https://haoutil.googlecode.com/svn/trunk/firefox/tudou_redirect.yql.xml" as tudou; select * from tudou where url="' + player + '" and referer="' + window.location.href + '"'),
                     onload: function(response) {
-                        var match = (isFx ? response.finalUrl : response.responseText).match(/(iid|youkuid|resourceid|autoplay)=[^&]+/ig);
-                        if(match) {
+                        var finalUrl = (isFx ? response.finalUrl : response.responseText);
+                        var match = finalUrl.match(/(iid|youkuid|resourceid|autoplay|snap_pic)=[^&]+/ig);
+                        if(match && !/error/i.test(finalUrl)) {
                             replace += '&' + match.join('&');
                             fn.reallyReplace.bind(fn, elem, find, replace)();
                         }
