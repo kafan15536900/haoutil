@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.4.1
+// @version         1.4.3
 // @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
 // @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
@@ -14,9 +14,13 @@
     function YoukuAntiADs() {};
     YoukuAntiADs.prototype = {
         SITES: {
-            'youku': {
-                'player': 'https://haoutil.googlecode.com/svn/trunk/player/youku.swf',
-                're': /http:\/\/static\.youku\.com(\/v[\d\.]+)?\/v\/swf\/(loader|q?player[^\.]*)\.swf/i
+            'youku_loader': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/loader.swf',
+                're': /http:\/\/static\.youku\.com(\/v[\d\.]+)?\/v\/swf\/loader\.swf/i
+            },
+            'youku_player': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/player.swf',
+                're': /http:\/\/static\.youku\.com(\/v[\d\.]+)?\/v\/swf\/q?player[^\.]*\.swf/i
             },
             'ku6': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/ku6.swf',
@@ -39,6 +43,18 @@
             'tudou_sp': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/sp.swf',
                 're': /http:\/\/js\.tudouui\.com\/.*\/socialplayer[^\.]*\.swf/i
+            },
+            'letv': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/letv.swf',
+                're': /http:\/\/.*letv[\w]*\.com\/.*\/(?!Live)[\w]{4}Player[^\.]*\.swf/i
+            },
+            'pplive': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/pplive.swf',
+                're': /http:\/\/player\.pplive\.cn\/ikan\/.*\/player4player2\.swf/i
+            },
+            'pplive_live': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/pplive_live.swf',
+                're': /http:\/\/player\.pplive\.cn\/live\/.*\/player4live2\.swf/i
             }
         },
         os: Cc['@mozilla.org/observer-service;1']
@@ -49,9 +65,8 @@
                 var wnd = this.getWindowForRequest(aSubject);
                 if(wnd) {
                     site['cond'] = [
-                        /bilibili/i.test(wnd.top.location.host),
-                        !/^((?!baidu).)*\.iqiyi\.com/i.test(wnd.top.location.host)
-                            || wnd.top.document.querySelector('span[data-flashplayerparam-flashurl]'),
+                        !/^((?!baidu|61).)*\.iqiyi\.com/i.test(wnd.self.location.host),
+                        wnd.self.document.querySelector('span[data-flashplayerparam-flashurl]'),
                         true
                     ];
                     if(!site['cond']) return;
