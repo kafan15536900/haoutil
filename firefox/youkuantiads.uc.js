@@ -28,7 +28,7 @@
             },
             'iqiyi': {
                 'player0': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi_out.swf',
-                'player1': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi5.swf',
+                'player1': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi5.swf',
                 'player2': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf',
                 're': /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i
             },
