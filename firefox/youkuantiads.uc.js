@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.4.3
+// @version         1.4.4
 // @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
 // @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
@@ -29,11 +29,11 @@
             'iqiyi': {
                 'player0': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi_out.swf',
                 'player1': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi5.swf',
-                'player2': 'https://haoutil.googlecode.com/svn/trunk/player/iqiyi.swf',
+                'player2': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi.swf',
                 're': /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i
             },
             'tudou': {
-                'player': 'https://haoutil.googlecode.com/svn/trunk/player/tudou.swf',
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/tudou.swf',
                 're': /http:\/\/js\.tudouui\.com\/.*portalplayer[^\.]*\.swf/i
             },
             'tudou_olc': {
@@ -65,7 +65,7 @@
                 var wnd = this.getWindowForRequest(aSubject);
                 if(wnd) {
                     site['cond'] = [
-                        !/^((?!baidu|61).)*\.iqiyi\.com/i.test(wnd.self.location.host),
+                        !/^((?!baidu|61|178).)*\.iqiyi\.com/i.test(wnd.self.location.host),
                         wnd.self.document.querySelector('span[data-flashplayerparam-flashurl]'),
                         true
                     ];
