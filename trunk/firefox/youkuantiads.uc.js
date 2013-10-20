@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.4.4
+// @version         1.4.5
 // @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
 // @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
@@ -24,7 +24,11 @@
             },
             'ku6': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/ku6.swf',
-                're': /http:\/\/player\.ku6cdn\.com\/.*\/\d+\/player\.swf/i
+                're': /http:\/\/player\.ku6cdn\.com\/default\/common\/player\/\d{12}\/player\.swf/i
+            },
+            'ku6_out': {
+                'player': 'https://haoutil.googlecode.com/svn/trunk/player/ku6_out.swf',
+                're': /http:\/\/player\.ku6cdn\.com\/default\/out\/\d{12}\/player\.swf/i
             },
             'iqiyi': {
                 'player0': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi_out.swf',
@@ -46,7 +50,11 @@
             },
             'letv': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/letv.swf',
-                're': /http:\/\/.*letv[\w]*\.com\/.*\/(?!Live)[\w]{4}Player[^\.]*\.swf/i
+                're': /http:\/\/.*letv[\w]*\.com\/(.*\/(?!live)((v2)?[\w]{4}|swf)player[^\.]*|[\w]*cloud)\.swf/i
+            },
+            'kletv': {
+                'player': 'http://player.haoutil.com/player/kletv.swf',
+                're': /http:\/\/player\.letvcdn\.com\/p\/.*\/1\/kletvplayer\.swf/i
             },
             'pplive': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/pplive.swf',
