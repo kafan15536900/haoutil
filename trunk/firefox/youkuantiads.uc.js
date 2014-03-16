@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.4.6
+// @version         1.4.7
 // @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
 // @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
@@ -59,7 +59,11 @@
             'pplive_live': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/pplive_live.swf',
                 're': /http:\/\/player\.pplive\.cn\/live\/.*\/player4live2\.swf/i
-            }
+            },
+	        'sohu': {
+	            'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/sohu.swf',
+	            're': /http:\/\/tv\.sohu\.com\/upload\/swf(\/p2p(\/yc)?)?\/\d+\/(main|playershell)\.swf/i
+	        }
         },
         os: Cc['@mozilla.org/observer-service;1']
                 .getService(Ci.nsIObserverService),
