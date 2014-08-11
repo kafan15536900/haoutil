@@ -5,7 +5,7 @@
 // @include         chrome://browser/content/browser.xul
 // @author          harv.c
 // @homepage        http://haoutil.tk
-// @version         1.6.1
+// @version         1.6.2
 // @updateUrl       https://j.mozest.com/zh-CN/ucscript/script/92.meta.js
 // @downloadUrl     https://j.mozest.com/zh-CN/ucscript/script/92.uc.js
 // ==/UserScript==
@@ -34,7 +34,11 @@
                 'player0': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi_out.swf',
                 'player1': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi5.swf',
                 'player2': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/iqiyi.swf',
-                're': /http:\/\/www\.iqiyi\.com\/player\/\d+\/player\.swf/i
+                're': /https?:\/\/www\.iqiyi\.com\/(player\/\d+\/player|common\/flashplayer\/\d+\/(main)?player.*)\.swf/i
+            },
+            'iqiyip2p': {
+                'player': 'http://www.iqiyi.com/player/20140709110406/20088.swf',
+                're': /https?:\/\/www\.iqiyi\.com\/common\/flashplayer\/\d+\/\d[a-z0-9]*.swf/i
             },
             'tudou': {
                 'player': 'https://haoutil.googlecode.com/svn/trunk/player/testmod/tudou.swf',
