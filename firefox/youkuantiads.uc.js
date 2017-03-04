@@ -244,7 +244,7 @@ var isDir = false;
 			this.originalListener.onStopRequest(request, context, Cr.NS_OK);
 		},
 		onDataAvailable: function(request, context, inputStream, offset, count) {
-			//Modify Content in-fight
+			//Modify Content in-flight
 			//Inline Modifier
 			//When respone code is not 200,Flash won't accept the content...nothing i can do to bypass it except to rewrite firefox's src
 
