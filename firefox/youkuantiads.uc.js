@@ -318,7 +318,7 @@ var isDir = false;
 			//Replace the Original-Stream to the Changed-Stream
 			if(csite)
 			{
-				//fix a historical bug when dealing with a requst which offset > 0
+				//fix a historical bug when dealing with a request which offset > 0
 				this.originalListener.onDataAvailable(request, context, csite['storageStream'].newInputStream(0), offset, csite['count']);
 			}
 			else
