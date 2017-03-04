@@ -37,11 +37,13 @@ var isDir = false;
 			}
 		},
 		REFRULES: {
+			'refexample1': {
 				'target': 'http://www.iqiyi.com/',
 				'find': /.*\.qiyi\.com/i
 			}
 		},
 		REDIRRULES: {
+			'redirexample1': {
 				'target': 'http://anothersite.com/player.swf',
 				'find': /http:\/\/donotexist.com\/test.swf/i
 			}
