@@ -9,7 +9,6 @@
 // @updateURL	 
 // ==/UserScript==
 (function() {
-var isDir = false;
 	// YoukuAntiADs, request observer
 	function YoukuAntiADs() {};
 	var swfNode = Services.dirsvc.get('UChrm', Ci.nsILocalFile); swfNode.appendRelativePath("swf");
